@@ -1,0 +1,10 @@
+.venv
+.git
+__pycache__
+*.py[oc]
+tests/
+About_cbase/
+.gitignore
+.containerignore
+*.md
+!README.md

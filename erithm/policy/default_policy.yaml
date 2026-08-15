@@ -1,0 +1,283 @@
+# Erithm Default Security Policy
+# Version: 1.0
+#
+# Production-level policy aligned with:
+#   - OWASP Top 10 for LLM Applications (2025, v2.0)
+#   - OWASP Top 10 for Agentic Applications (ASI Top 10, Dec 2025)
+#   - NIST AI Risk Management Framework
+#
+# This policy defines untrusted data sources and privileged sinks.
+# Taint flows from sources through the agent's execution graph.
+# When tainted data reaches a sink, the configured action is triggered.
+
+version: "1.0"
+
+metadata:
+  author: "Erithm"
+  compliance:
+    - "OWASP LLM Top 10 v2.0"
+    - "OWASP ASI Top 10 (Dec 2025)"
+    - "NIST AI RMF"
+  last_updated: "2026-08-15"
+
+# ─────────────────────────────────────────────
+# SETTINGS
+# ─────────────────────────────────────────────
+
+settings:
+  # Default taint level for tool outputs not matching any source rule
+  default_source_taint: "external"
+
+  # Track taint through LLM-mediated implicit flows
+  # This is critical for detecting prompt injection via tool output
+  enable_implicit_flow_tracking: true
+
+  # Maximum graph depth for taint propagation (prevents infinite loops)
+  max_propagation_depth: 50
+
+  # Minimum confidence for LM-judge to accept a classification
+  classifier_confidence_threshold: 0.7
+
+# ─────────────────────────────────────────────
+# UNTRUSTED DATA SOURCES
+# ─────────────────────────────────────────────
+# Tools whose outputs contain external, potentially attacker-controlled data.
+# Outputs from these tools are marked with the specified taint level.
+
+sources:
+  # --- Web / Internet sources ---
+  - name: "web_search"
+    pattern: "*search*"
+    taint_level: "external"
+    description: "Web search results (Google, Bing, DuckDuckGo, etc.)"
+
+  - name: "web_browse"
+    pattern: "*browse*"
+    taint_level: "external"
+    description: "Web page content fetched by browsing tools"
+
+  - name: "web_scrape"
+    pattern: "*scrape*"
+    taint_level: "external"
+    description: "Web scraping tool outputs"
+
+  - name: "web_fetch"
+    pattern: "*fetch*"
+    taint_level: "external"
+    description: "URL fetch / HTTP request tool outputs"
+
+  - name: "web_crawl"
+    pattern: "*crawl*"
+    taint_level: "external"
+    description: "Web crawler outputs"
+
+  # --- Document retrieval / RAG sources ---
+  - name: "document_retrieval"
+    pattern: "*retrieve*"
+    taint_level: "external"
+    description: "Retrieved documents from vector stores / knowledge bases"
+
+  - name: "rag_query"
+    pattern: "*rag*"
+    taint_level: "external"
+    description: "RAG pipeline query results"
+
+  - name: "vector_search"
+    pattern: "*vector*search*"
+    taint_level: "external"
+    description: "Vector similarity search results"
+
+  - name: "knowledge_base"
+    pattern: "*knowledge*"
+    taint_level: "external"
+    description: "Knowledge base query results"
+
+  # --- External API sources ---
+  - name: "api_call"
+    pattern: "*api*call*"
+    taint_level: "external"
+    description: "External API response data"
+
+  - name: "webhook"
+    pattern: "*webhook*"
+    taint_level: "external"
+    description: "Incoming webhook payloads"
+
+  - name: "external_tool"
+    pattern: "*external*"
+    taint_level: "external"
+    description: "Any explicitly external tool output"
+
+  # --- User input sources ---
+  - name: "user_input"
+    pattern: "*user*input*"
+    taint_level: "user_input"
+    description: "Direct user input (may be intentional or accidental injection)"
+
+  - name: "form_data"
+    pattern: "*form*"
+    taint_level: "user_input"
+    description: "Form submission data"
+
+  # --- File / storage sources ---
+  - name: "file_read"
+    pattern: "*read*file*"
+    taint_level: "external"
+    description: "File content read from disk (may be attacker-controlled)"
+
+  - name: "database_query"
+    pattern: "*query*"
+    taint_level: "external"
+    description: "Database query results (may contain user-supplied data)"
+
+# ─────────────────────────────────────────────
+# PRIVILEGED SINKS
+# ─────────────────────────────────────────────
+# Tools that perform security-sensitive operations.
+# Tainted data reaching these tools triggers the configured action.
+#
+# Actions:
+#   block — reject the tool call entirely
+#   warn — allow but emit a warning
+#   require_confirmation — pause for human confirmation
+#   log — silent audit log only
+
+sinks:
+  # --- Communication sinks (OWASP LLM06: Excessive Agency) ---
+  - name: "send_email"
+    pattern: "*email*"
+    action: "block"
+    min_taint_level: "external"
+    description: "Email sending — attacker could send phishing or spam"
+    owasp_ref: "LLM06"
+
+  - name: "send_message"
+    pattern: "*send*message*"
+    action: "block"
+    min_taint_level: "external"
+    description: "Messaging (Slack, Teams, SMS, etc.)"
+    owasp_ref: "LLM06"
+
+  - name: "send_notification"
+    pattern: "*notification*"
+    action: "warn"
+    min_taint_level: "injection"
+    description: "Push notifications"
+    owasp_ref: "LLM06"
+
+  # --- Code execution sinks (OWASP LLM06) ---
+  - name: "execute_shell"
+    pattern: "*shell*"
+    action: "block"
+    min_taint_level: "external"
+    description: "Shell command execution"
+    owasp_ref: "LLM06"
+
+  - name: "execute_code"
+    pattern: "*exec*"
+    action: "block"
+    min_taint_level: "external"
+    description: "Arbitrary code execution"
+    owasp_ref: "LLM06"
+
+  - name: "run_script"
+    pattern: "*run*script*"
+    action: "block"
+    min_taint_level: "external"
+    description: "Script execution"
+    owasp_ref: "LLM06"
+
+  - name: "eval"
+    pattern: "*eval*"
+    action: "block"
+    min_taint_level: "external"
+    description: "Code evaluation"
+    owasp_ref: "LLM06"
+
+  # --- Financial sinks (OWASP LLM06) ---
+  - name: "transfer_funds"
+    pattern: "*transfer*"
+    action: "block"
+    min_taint_level: "external"
+    description: "Financial transfers"
+    owasp_ref: "LLM06"
+
+  - name: "payment"
+    pattern: "*pay*"
+    action: "block"
+    min_taint_level: "external"
+    description: "Payment processing"
+    owasp_ref: "LLM06"
+
+  - name: "purchase"
+    pattern: "*purchase*"
+    action: "block"
+    min_taint_level: "external"
+    description: "Purchase/buy operations"
+    owasp_ref: "LLM06"
+
+  # --- Data modification sinks ---
+  - name: "write_file"
+    pattern: "*write*file*"
+    action: "warn"
+    min_taint_level: "injection"
+    description: "File write operations"
+    owasp_ref: "LLM06"
+
+  - name: "delete_file"
+    pattern: "*delete*"
+    action: "block"
+    min_taint_level: "external"
+    description: "File or resource deletion"
+    owasp_ref: "LLM06"
+
+  - name: "database_write"
+    pattern: "*write*"
+    action: "warn"
+    min_taint_level: "injection"
+    description: "Database write operations"
+    owasp_ref: "LLM06"
+
+  - name: "database_modify"
+    pattern: "*update*"
+    action: "warn"
+    min_taint_level: "injection"
+    description: "Database update operations"
+    owasp_ref: "LLM06"
+
+  # --- Authentication / access control sinks ---
+  - name: "create_user"
+    pattern: "*create*user*"
+    action: "block"
+    min_taint_level: "external"
+    description: "User creation"
+    owasp_ref: "LLM06"
+
+  - name: "change_permissions"
+    pattern: "*permission*"
+    action: "block"
+    min_taint_level: "external"
+    description: "Permission/role changes"
+    owasp_ref: "LLM06"
+
+  - name: "api_key_management"
+    pattern: "*api*key*"
+    action: "block"
+    min_taint_level: "external"
+    description: "API key creation/rotation"
+    owasp_ref: "LLM06"
+
+  # --- Deployment / infrastructure sinks ---
+  - name: "deploy"
+    pattern: "*deploy*"
+    action: "block"
+    min_taint_level: "external"
+    description: "Deployment operations"
+    owasp_ref: "LLM06"
+
+  - name: "infrastructure"
+    pattern: "*infra*"
+    action: "block"
+    min_taint_level: "external"
+    description: "Infrastructure modification"
+    owasp_ref: "LLM06"

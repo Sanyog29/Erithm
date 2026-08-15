@@ -8,3 +8,35 @@ wheels/
 
 # Virtual environments
 .venv
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Testing
+.pytest_cache/
+htmlcov/
+.coverage
+coverage.xml
+
+# Distribution
+*.tar.gz
+*.whl
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+# Codebase documentation (internal only)
+About_cbase/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Container
+*.log
