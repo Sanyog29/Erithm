@@ -6,6 +6,8 @@
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+[![CI](https://github.com/Sanyog29/Erithm/actions/workflows/ci.yml/badge.svg)](https://github.com/Sanyog29/Erithm/actions/workflows/ci.yml)
+[![Container](https://img.shields.io/badge/ghcr.io-sanyog29%2Ferithm-blue?logo=github)](https://github.com/Sanyog29/Erithm/pkgs/container/erithm)
 [![OWASP Aligned](https://img.shields.io/badge/OWASP-Aligned-orange.svg)](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
 [![NIST AI RMF](https://img.shields.io/badge/NIST-AI%20RMF-blue.svg)](https://www.nist.gov/artificial-intelligence/ai-risk-management-framework)
 
@@ -259,18 +261,39 @@ Erithm is a security tool — it holds itself to the standard it enforces.
 
 ## 🐳 Container Deployment
 
+The Erithm container image is automatically built and published to
+**GitHub Container Registry** on every push to `main`.
+
+### Pull from Registry (Recommended)
+
+```bash
+# Pull the latest image — no build step needed
+docker pull ghcr.io/sanyog29/erithm:latest
+# or with Podman
+podman pull ghcr.io/sanyog29/erithm:latest
+
+# Run analysis on a local trace file
+docker run --rm -v ./traces:/data:ro \
+  ghcr.io/sanyog29/erithm:latest analyze /data/trace.json
+
+# Run with a custom policy file
+docker run --rm \
+  -v ./traces:/data:ro \
+  -v ./my_policy.yaml:/app/policy.yaml:ro \
+  ghcr.io/sanyog29/erithm:latest analyze /data/trace.json --policy /app/policy.yaml
+
+# Show help
+docker run --rm ghcr.io/sanyog29/erithm:latest --help
+```
+
+### Build Locally (Contributors)
+
 ```bash
 # Build with Podman (rootless, daemonless)
 podman build -t erithm -f Containerfile .
 
-# Run analysis
+# Run analysis from local build
 podman run --rm -v ./traces:/data:ro erithm analyze /data/trace.json
-
-# Run with custom policy
-podman run --rm \
-  -v ./traces:/data:ro \
-  -v ./my_policy.yaml:/app/policy.yaml:ro \
-  erithm analyze /data/trace.json --policy /app/policy.yaml
 ```
 
 ---
@@ -327,6 +350,6 @@ MIT License — see [LICENSE](LICENSE) for details.
 
 <div align="center">
 
-**Built by [Ace](https://github.com/Sanyog29)** · Protecting agents from the inside out.
+**Built by [Sanyog](https://github.com/Sanyog29)** · Protecting agents from the inside out.
 
 </div>
