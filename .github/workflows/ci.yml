@@ -46,6 +46,13 @@ jobs:
       - name: Run tests with coverage
         run: uv run pytest tests/ -v --cov=erithm --cov-report=term-missing --cov-report=xml
 
+      - name: Smoke test — CLI health check
+        run: |
+          erithm version
+          erithm --help
+          erithm analyze traces/clean_trace.json --output json
+          erithm analyze traces/injection_trace.json --output json || true
+
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
         if: always()

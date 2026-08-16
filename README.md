@@ -68,11 +68,17 @@ uv pip install -e ".[dev]"
 pip install -e ".[dev]"
 ```
 
-### Run the Demo
+### Try It Now
 
 ```bash
-# See Erithm detect a simulated prompt injection attack
-python main.py
+# Analyze a bundled sample trace — see Erithm detect a prompt injection attack
+erithm analyze traces/injection_trace.json
+
+# Clean trace — Erithm should ALLOW
+erithm analyze traces/clean_trace.json
+
+# Data exfiltration trace — Erithm should BLOCK
+erithm analyze traces/exfil_trace.json
 ```
 
 ### Analyze a Trace File
@@ -309,23 +315,25 @@ pytest tests/ -v
 
 # Run with coverage
 pytest tests/ --cov=erithm --cov-report=term-missing
-
-# Run the demo
-python main.py
 ```
 
 ### Project Structure
 
 ```
-erithm/
-├── ingest/          # Stage 1: OTel span collection & normalization
-├── graph/           # Stage 2: Data-flow graph construction
-├── taint/           # Stage 3: Taint propagation & classification (core)
-├── policy/          # YAML policy DSL loading & validation
-├── verdict/         # Stage 4: Verdict engine & audit logging
-├── middleware/       # Drop-in agent integration layer
-├── utils/           # OTel compat layer, content redaction
-└── cli.py           # Rich-formatted CLI interface
+Erithm/
+├── erithm/              # Core library
+│   ├── ingest/          # Stage 1: OTel span collection & normalization
+│   ├── graph/           # Stage 2: Data-flow graph construction
+│   ├── taint/           # Stage 3: Taint propagation & classification (core)
+│   ├── policy/          # YAML policy DSL loading & validation
+│   ├── verdict/         # Stage 4: Verdict engine & audit logging
+│   ├── middleware/      # Drop-in agent integration layer
+│   ├── utils/           # OTel compat layer, content redaction
+│   └── cli.py           # Rich-formatted CLI interface
+├── traces/              # Bundled sample OTel trace files
+├── tests/               # Full pytest test suite (61 tests)
+├── Containerfile        # Rootless multi-stage container build
+└── pyproject.toml       # Package metadata & dependencies
 ```
 
 ---

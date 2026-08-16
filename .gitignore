@@ -34,6 +34,9 @@ coverage.xml
 # Codebase documentation (internal only)
 About_cbase/
 
+# Scratch / dev scripts
+scratch_*.py
+
 # OS
 .DS_Store
 Thumbs.db

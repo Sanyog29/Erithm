@@ -1,0 +1,77 @@
+[
+  {
+    "traceId": "sample-clean-001",
+    "spanId": "span-001",
+    "name": "web_search",
+    "startTimeUnixNano": "1000000000",
+    "endTimeUnixNano": "1500000000",
+    "attributes": {
+      "gen_ai.tool.name": "web_search",
+      "gen_ai.operation.name": "tool"
+    },
+    "events": [
+      {
+        "name": "gen_ai.content.tool.input",
+        "attributes": {
+          "content": "{\"query\": \"weather today\"}"
+        }
+      },
+      {
+        "name": "gen_ai.content.tool.output",
+        "attributes": {
+          "content": "Today is sunny, 28\u00b0C. No alerts."
+        }
+      }
+    ]
+  },
+  {
+    "traceId": "sample-clean-001",
+    "spanId": "span-002",
+    "name": "llm_call",
+    "startTimeUnixNano": "2000000000",
+    "endTimeUnixNano": "3000000000",
+    "attributes": {
+      "gen_ai.request.model": "gpt-4o",
+      "gen_ai.operation.name": "chat"
+    },
+    "events": [
+      {
+        "name": "gen_ai.content.prompt",
+        "attributes": {
+          "content": "Summarize the weather results."
+        }
+      },
+      {
+        "name": "gen_ai.content.completion",
+        "attributes": {
+          "content": "It's sunny and 28\u00b0C today."
+        }
+      }
+    ]
+  },
+  {
+    "traceId": "sample-clean-001",
+    "spanId": "span-003",
+    "name": "display_result",
+    "startTimeUnixNano": "4000000000",
+    "endTimeUnixNano": "4500000000",
+    "attributes": {
+      "gen_ai.tool.name": "display_result",
+      "gen_ai.operation.name": "tool"
+    },
+    "events": [
+      {
+        "name": "gen_ai.content.tool.input",
+        "attributes": {
+          "content": "{\"text\": \"Sunny, 28C today\"}"
+        }
+      },
+      {
+        "name": "gen_ai.content.tool.output",
+        "attributes": {
+          "content": "Displayed."
+        }
+      }
+    ]
+  }
+]
