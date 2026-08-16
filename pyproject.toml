@@ -1,6 +1,6 @@
 [project]
 name = "erithm"
-version = "0.1.0"
+version = "1.0.0"
 description = "Taint-analysis firewall for LLM tool-calling agents. Detects prompt injection via tool output before it reaches privileged sinks."
 readme = "README.md"
 license = "MIT"
@@ -18,7 +18,7 @@ keywords = [
     "firewall",
 ]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
@@ -53,6 +53,7 @@ erithm = "erithm.cli:main"
 [project.urls]
 Homepage = "https://github.com/Sanyog29/Erithm"
 Repository = "https://github.com/Sanyog29/Erithm"
+Documentation = "https://github.com/Sanyog29/Erithm#readme"
 Issues = "https://github.com/Sanyog29/Erithm/issues"
 
 [build-system]
